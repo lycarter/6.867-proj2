@@ -1,3 +1,3 @@
 # 6.867-proj2
 
-Collaborators: Liang Zhou
+Collaborators: Landon Carter, Liang Zhou
