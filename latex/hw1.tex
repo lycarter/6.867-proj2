@@ -14,7 +14,7 @@
 
 \title{\vspace{-4ex}Regression and SVM\vspace{-3.5ex}}
 \begin{document}
-\newgeometry{top=0.75in,left=0.75in,right=0.75in,bottom=1.25in}
+\newgeometry{top=0.75in,left=0.75in,right=0.75in,bottom=1in}
 \maketitle
 \vspace{-0.5em}
 \begin{abstract}
@@ -106,7 +106,7 @@ However, if we vary $\lambda$, then we obtain more stable solutions with respect
 
 \end{figure}
 
-Figures 1-4 show the training data, and figures 5-8 show the validation data for $\lambda = 0$. The predictor is reasonably effective and seems to seek to minimize the loss. When we increase $\lambda$, however, we instead increase the loss as we try to minimize the $\lambda w^\intercal w$ term in the error function. This means that the model is more inaccurate in this case, which is because with two parameters, $w$ wasn't likely going to overfit to the data anyways. But note that the effect is not too large, even for larger $\lambda$ ($\lambda = 40$) - our main goal is still to minimize the total error.
+Figures 1-4 show the training data, and figures 5-8 show the validation data for $\lambda = 0$. The predictor is reasonably effective and seems to seek to minimize the loss. When we increase $\lambda$, however, we instead increase the loss as we try to minimize the $\lambda w^\intercal w$ term in the error function. This means that the model is more inaccurate in this case, which is because with two parameters, $w$ wasn't likely going to overfit to the data anyways. But note that the effect is not too large, even for larger $\lambda$ ($\lambda = 40$) - our main goal is still to minimize the total error. In the case where the data is unseparable, as the model can't do much about the logistic error, it attempts to shrink $w$ as much as possible while still maintaining the (relatively high) original logistic loss.
 
 
 
