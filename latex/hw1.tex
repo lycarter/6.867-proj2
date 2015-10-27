@@ -19,7 +19,14 @@
 \end{abstract}
 
 \section{Logistic Regression}
-
+In past discussions, we've often encountered the objective function of our MLE estimate, or of some other estimate that we've established for some parameter $\theta$ that we'd like to minimize so as to minimize the value of our error function. This is called \textbf{regression}. Here we will discuss \textbf{logistic regression}, which involves fitting the data to a curve of the form
+$$\sigma(x) = \frac{1}{1+e^{-x}}$$
+This is known as the \textbf{sigmoid} function, and it's often used when the data we would like to fit is well-modeled as a classification problem (with labels +1 and -1). Given $d$-dimensional data $x^{(1)}, x^{(2)}, ... , x^{(n)}$ and corresponding scalar labels $y^{(1)}, y^{(2)}, ... , y^{(n)}$, we can define our LR objection function as:
+$$\text{NLL}(w) = \sum_{i=0}^n\log(1+e^{-y^{(i)}(x^{(i)}\cdot w+w_0)})$$
+given the parameters $w, w_0$. To reduce overfitting, we can apply an $L2$ regularization term to our equation, as in ridge regression. As a result, we are simply minimizing
+$$E_{LR}(w) = \text{NLL}(w)+\lambda w^\intercal w$$
+so that
+$$w^* = \text{argmin}_w \left[\sum_{i=0}^n\log(1+e^{-y^{(i)}(x^{(i)}\cdot w+w_0)}) + \lambda w^\intercal w\right]$$
 \section{Support Vector Machines}
 Support Vector Machines are a machine-learning technique that is used to classify binary sets of data. We define $\theta$ as the normal to the decision hyperplane, and classify data points by $\sign (\theta^\intercal x + \theta_0)$. In order to train the classifier, we initially set up the minimization problem (known as \textbf{Hard-SVM}):
 
@@ -51,6 +58,7 @@ To provide some intuition: $\alpha_i$ is the weight of each training point on th
 
 Where $\mathcal{M} = \{ i : 0 < \alpha_i < C \}$ and $\mathcal{S} = \{ i : 0 < \alpha_i \}$.
 
+\section{Titanic Data}
 \end{document}
 
 
