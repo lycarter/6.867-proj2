@@ -28,8 +28,13 @@ arr(:,secondcol) = reshape(yy, numel(yy), 1);
 
 %arr=[xx(:),yy(:)];
 zz = zeros(length(arr),1);
+<<<<<<< HEAD
 for i=1:length(arr)
     zz(i) = scoreFn(arr(i,:)'); 
+=======
+for i=1:length(arr),
+    zz(i) = scoreFn(arr(i,:)');
+>>>>>>> aa77a4445ee3f427dd0c86dadf0c668c3b967914
 end  
 zz=reshape(zz,size(xx));
    
@@ -40,4 +45,11 @@ colormap cool
 [C,h]=contour(xx, yy, zz, values);
 set(h,'ShowText','on');
 %Plot the training points
+<<<<<<< HEAD
 scatter(X(:,firstcol),X(:,secondcol),50,1-Y);
+=======
+X = X + rand(size(X))*.3-.15;
+scatter(X(:,1),X(:,2),50,1-Y);
+%axis([-1, 2, 0, 80]);
+end
+>>>>>>> aa77a4445ee3f427dd0c86dadf0c668c3b967914
