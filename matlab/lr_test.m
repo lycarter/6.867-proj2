@@ -4,12 +4,13 @@ disp('======Training======');
 
 data = importdata(strcat('../hw2_resources/data/data_',name,'_train.csv'));
 
-X = data(:,1:2);
-Y = data(:,3);
+X = data(:,1:11);
+Y = data(:,12);
 
 % Carry out training.
 %%% TODO %%%
-mint = gradDescentLR([1, 1, 1], 0.001, 0.008, X, Y, 30);
+
+mint = gradDescentLR([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 0.001, 0.008, X, Y, 6);
 % Define the predictLR(x) function, which uses trained parameters
 %%% TODO %%%
 function label = predictLR(x)
@@ -30,8 +31,8 @@ plotDecisionBoundary(X, Y, @predictLR, [0.5, 0.5], 'LR Train');
 disp('======Validation======');
 % load data from csv files
 validate = importdata(strcat('../hw2_resources/data/data_',name,'_validate.csv'));
-X = validate(:,1:2);
-Y = validate(:,3);
+X = validate(:,1:11);
+Y = validate(:,12);
 
 % plot validation results
 plotDecisionBoundary(X, Y, @predictLR, [0.5, 0.5], 'LR Validate');
