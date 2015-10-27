@@ -23,6 +23,7 @@ for i = 1:vdim
     temp = empty;
     temp(i) = 1;
     z(1,i) = f(x+d*temp, X, Y, lambda) - f(x-d*temp, X, Y, lambda);
+    
 end
 grad = z./delta;
 end

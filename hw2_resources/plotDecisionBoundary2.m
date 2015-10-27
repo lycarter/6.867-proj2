@@ -28,8 +28,6 @@ colormap cool
 [C,h]=contour(xx, yy, zz, values);
 set(h,'ShowText','on');
 %Plot the training points
-X = X + rand(size(X))*.3-.15;
-axis([-1.5, 2, 0, 1.5]);
 scatter(X(:,1),X(:,2),50,1-Y);
 
     
