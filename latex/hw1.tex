@@ -106,7 +106,11 @@ However, if we vary $\lambda$, then we obtain more stable solutions with respect
 
 Figures 1-4 show the training data, and figures 5-8 show the validation data for $\lambda = 0$. The predictor is reasonably effective and seems to seek to minimize the loss. When we increase $\lambda$, however, we instead increase the loss as we try to minimize the $\lambda w^\intercal w$ term in the error function. This means that the model is more inaccurate in this case, which is because with two parameters, $w$ wasn't likely going to overfit to the data anyways. But note that the effect is not too large, even for larger $\lambda$ ($\lambda = 40$) - our main goal is still to minimize the total error.
 
+
+
+
 \section{Support Vector Machines}
+\subsection{Overview and Formulation}
 Support Vector Machines are a machine-learning technique that is used to classify binary sets of data. We define $\theta$ as the normal to the decision hyperplane, and classify data points by $\sign (\theta^\intercal x + \theta_0)$. In order to train the classifier, we initially set up the minimization problem (known as \textbf{Hard-SVM}):
 
 \begin{equation}
@@ -128,8 +132,7 @@ s.t. \hspace{.75em} 0 \le \alpha_i \le C & \\
 \sum_i \alpha_i y^{(i)} = 0 &
 \end{align}
 
-To provide some intuition: $\alpha_i$ is the weight of each training point on the final decision boundary. It is 0 for all $x^{(i)}$ that are farther from the decision boundary than the margin, so that only the ``important'' $x^{(i)}$ are ``support vectors''. $C$ is the maximum value of $\alpha$, and determines the size of the margin. \textbf{ADD SOMETHING ABOUT WHICH WAY THAT WORKS HERE}. To return from $\alpha$ to the more familiar $\theta$ and $\theta_0$, we plug in:
-
+To provide some intuition: $\alpha_i$ is the weight of each training point on the final decision boundary. It is 0 for all $x^{(i)}$ that are farther from the decision boundary than the margin, so that only the ``important'' $x^{(i)}$ are ``support vectors''. $C$ is the maximum value of $\alpha$, and determines the size of the margin. In particular, for small $C$, the margin is very large, and vice versa.. To return from $\alpha$ to the more familiar $\theta$ and $\theta_0$, we plug in:
 \begin{align}
 \theta &= \sum_{i=1}^n \alpha_i y^{(i)} x^{(i)} \\
 \theta_0 &= \dfrac{1}{\mathcal{M}} \left[ \sum_{j \in \mathcal{M}} \left( y^{(j)} - \sum_{i \in \mathcal{S}} \alpha_i y^{(i)} (x^{(j)})^\intercal x^{(i)} \right) \right]
@@ -137,19 +140,60 @@ To provide some intuition: $\alpha_i$ is the weight of each training point on th
 
 Where $\mathcal{M} = \{ i : 0 < \alpha_i < C \}$ and $\mathcal{S} = \{ i : 0 < \alpha_i \}$.
 
-For example, given the data $X = [1, 2;\ 2, 2;\ 0, 0;\ -2, 3], Y = [1;\ 1;\ -1;\ -1]$, we generate the following objective function:
+For example, given the data $X = [1, 2;\ 2, 2;\ 0, 0;\ -2, 3], Y = [1;\ 1;\ -1;\ -1]$, we generate the following objective function and constraints (taking the opportunity to insert a kernel function, $K$):
 
 \begin{equation}
-\min_{\alpha \in \mathbb{R}^n} \left[\dfrac{1}{2} \sum_{i=1}^n \sum_{j=1}^n \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^\intercal x^{(j)} - \sum_{i=1}^n \alpha_i \right]
+\min_{\alpha \in \mathbb{R}^n} \left[\dfrac{1}{2} \sum_{i=1}^n \sum_{j=1}^n \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^\intercal x^{(j)} - \sum_{i=1}^n \alpha_i \right] \\
+\Leftrightarrow \min_{\alpha \in \mathbb{R}^n}\left[\dfrac{1}{2} \alpha^\intercal H \alpha + f^\intercal \alpha\right]
+\end{equation}
+\begin{align}
+H_{i,j} =&\ y^{(i)} y^{(j)} K(x^{(i)},x^{(j)}) \\
+f =&\ [-1\ -1\ \ldots\ -1]\ \text{(of length $n$)} \\
+&\ s.t. \hspace{.75em} Y^\intercal \alpha = 0 \\
+&\ s.t. \hspace{.75em} 0 \le \alpha_i \le C, \forall i \in n
+\end{align}
+
+\subsection{Testing Implementation}
+
+Applying our implementation of the soft-SVM to the 4 datasets from part 1, setting $C = 1$, we obtain the classifiers in \ref{fig:stdev1} - \ref{fig:nonsep}. We note that the classifiers are reasonable for the three separable data sets, and that the margin grows as the standard deviation of the test sets increases. This makes sense - we are less sure about the classification for these, so the margin grows. Our validation errors were 0.0822, 68.67, 227.0, and 404.7, respectively. The training errors were 1.16, 88.56, 240.9, and 396.6, respectively. Again, these errors are logical and match what we expect - as the data becomes less easily separable, the error increases.
+
+\begin{center}
+\begin{figure}[!htb]
+\minipage{0.48\textwidth}
+  \includegraphics[width=\linewidth]{figures/stdev1.png}
+  \caption{\texttt{stdev1}}\label{fig:stdev1}
+\endminipage\hfill
+\minipage{0.48\textwidth}
+  \includegraphics[width=\linewidth]{figures/stdev2.png}
+  \caption{\texttt{stdev2}}
+\endminipage
+\end{figure}
+\begin{figure}[!htb]
+\minipage{0.48\textwidth}
+  \includegraphics[width=\linewidth]{figures/stdev4.png}
+  \caption{\texttt{stdev4}}
+\endminipage\hfill
+\minipage{0.48\textwidth}
+  \includegraphics[width=\linewidth]{figures/nonsep.png}
+  \caption{\texttt{nonsep}}\label{fig:nonsep}
+\endminipage
+\end{figure}
+\end{center}
+
+\subsection{Kernel Extension}
+As was briefly mentioned in 2.1, we can easily insert a kernel function into the dual form of the SVM. In this particular case, we choose to insert the Gaussian Radial Basis Function (RBF):
+
+\begin{equation}
+K(x_1,x_2) = \exp\left( -\dfrac{||x_1-x_2||^2}{2\sigma^2} \right)
 \end{equation}
 
-This can be reformulated to be plugged into a standard quadratic programming solver, with \textbf{blah blah blah}
+This is particularly useful, because instead of looking at the dot product of $x_1$ and $x_2$, we instead may examine the distance between them, allowing us to find radially clustered groups. In this formulation, $\sigma$ is a scalar, and so all dimensions must be normalized with respect to their std deviation in order to obtain meaningful results. Alternative formulations exist that have vector $\sigma$ to account for variances in std deviation. Applying the RBF kernel to the \texttt{nonsep} dataset, setting $\sigma = 1$ and varying $C$, we obtain the classifiers in figures \ref{fig:c01} - \ref{fig:c100}.
 
 \begin{center}
 \begin{figure}[!htb]
 \minipage{0.32\textwidth}
   \includegraphics[width=\linewidth]{figures/C,01sigma1.png}
-  \caption{$C = 0.01, \sigma = 1$}
+  \caption{$C = 0.01, \sigma = 1$}\label{fig:c01}
 \endminipage\hfill
 \minipage{0.32\textwidth}
   \includegraphics[width=\linewidth]{figures/C,1sigma1.png}
@@ -168,17 +212,52 @@ This can be reformulated to be plugged into a standard quadratic programming sol
 \endminipage
 \minipage{0.32\textwidth}
   \includegraphics[width=\linewidth]{figures/C100sigma1.png}
-  \caption{$C = 100, \sigma = 1$}
+  \caption{$C = 100, \sigma = 1$}\label{fig:c100}
 \endminipage
 \end{figure}
 \end{center}
 
-We also note that as $C$ increases, the number of boundary points decreases. Thus, the number of support vectors decrease. For the nonseparable example, for $C = (.01, .1, 1, 10, 100)$, we see that $\mathcal{M} = (400, 324, 133, 68, 59)$.
+We also note that as $C$ increases, the number of boundary points decreases. Thus, the number of support vectors decrease. For the nonseparable example, for $C = (.01, .1, 1, 10, 100)$, we see that $\mathcal{M} = (400, 324, 133, 68, 59)$. Varying $\sigma$, we notice that the ``clusters'' the classifier finds are composed of many smaller Gaussians for small $\sigma$ and composed of fewer larger Gaussians for larger $\sigma$. Basically, the size of the ``clumps'' the classifier looks for proportional to $\sigma$.
 
-As per the usual procedure with the approximately equivalent $\lambda$, to select the correct $C$, we first compute $\alpha$ for various values of $C$ using a training set, then determine the validation error using a validation set. We select the $C$ which produces the lowest validation error in order to maximize the generality of our solution.
-
-
+As per the usual procedure we used in regression on the approximately equivalent $\lambda$, to select the correct $C$ we first compute $\alpha$ for various values of $C$ using a training set, then determine the validation error using a validation set. We select the $C$ which produces the lowest validation error in order to maximize the generality of our solution.
 \section{Titanic Data}
+
+\subsection{LR}
+\subsection{SVM}
+Now, we apply the SVM to the Titanic dataset. We apply the standard method to select $C$ (ie, calculate the loss on the validation set for the classifiers trained with the training set for various values of $C$.) Applying this method, we get $C = 0.1$, which leads to a validation error of 81.1067. The classifier this creates, using a linear kernel, is summarized below:
+
+\begin{table}[!htb]
+\centering
+\caption{$\theta_i$ for $C = 0.1$.}
+\begin{tabular}{rlc}
+Column & Meaning                           & $\theta_i$\\ \hline
+1      & Passenger Class 1                 & 2.02e-04  \\
+2      & Passenger Class 2                 & 3.87e-04  \\
+3      & Passenger Class 3                 & -5.89e-04 \\
+4      & Sex                               & 2.00      \\
+5      & Age                               & -1.10e-05 \\
+6      & Number of Siblings/Spouses Aboard & -5.64e-05 \\
+7      & Number of Parents/Children Aboard & 3.10e-04  \\
+8      & Passenger Fare                    & 2.77e-06  \\
+9      & Embark from Southampton           & -3.20e-04 \\
+10     & Embark from Cherbourg             & 1.68e-04  \\
+11     & Embark from Queenstown            & 1.52e-04  \\
+\end{tabular}
+\end{table}
+
+We can clearly see from $\theta_i$ that sex is by far the most important factor towards determining $y$. Plotting, for example, sex on the x-axis and age on the y-axis, as well as the $\theta$ generated when considering just these two factors, we see that the examples are split fairly well by sex, but age is well-mixed. In the plot, we add a scattering factor of some random number in $[-.15,.15]$ to the plotted points ($\theta$ is trained on the points before the scattering factor).
+
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=.75\linewidth]{figures/sex_age_validate.png}
+\caption{Decision boundary considering only age and sex}
+\end{center}
+\end{figure}
+
+Overall, our final testing error is 81.1.
+
+\subsection{Comparing and Contrasting LR and SVM}
+Comparing the results from LR and SVM, we see that they are very similar. They both report the sex as the most important factor when determining $y$, by a large margin. 
 \end{document}
 
 

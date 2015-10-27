@@ -1,4 +1,4 @@
-function plotDecisionBoundary(X, Y, scoreFn, values, mytitle)
+function plotDecisionBoundary(X, Y, scoreFn, values, mytitle, firstcol, secondcol)
 % X is data matrix (each row is a data point)
 % Y is desired output (1 or -1)
 % scoreFn is a function of a data point
@@ -9,14 +9,26 @@ function plotDecisionBoundary(X, Y, scoreFn, values, mytitle)
     
 mins=min(X)-1;
 maxes=max(X)+1;
+
+avgs = mean(X);
     
-h = max((maxes(1)-mins(1))/200., (maxes(2)-mins(2))/200.);
-    
-[xx, yy] = meshgrid(mins(1):h:maxes(1), mins(2):h:maxes(2));
-    
-arr=[xx(:),yy(:)];
+% h = max((maxes(1)-mins(1))/200., (maxes(2)-mins(2))/200.);
+h1 = (maxes(firstcol)-mins(firstcol))/50.;
+h2 = (maxes(secondcol)-mins(secondcol))/50.;
+% h = max((maxes(firstcol)-mins(firstcol))/50., (maxes(secondcol)-mins(secondcol))/50.);
+
+[xx, yy] = meshgrid(mins(firstcol):h1:maxes(firstcol), mins(secondcol):h2:maxes(secondcol));
+
+size(xx)
+
+arr = ones(numel(xx),1)*avgs;
+
+arr(:,firstcol) = reshape(xx,numel(xx), 1);
+arr(:,secondcol) = reshape(yy, numel(yy), 1);
+
+%arr=[xx(:),yy(:)];
 zz = zeros(length(arr),1);
-for i=1:length(arr),
+for i=1:length(arr)
     zz(i) = scoreFn(arr(i,:)'); 
 end  
 zz=reshape(zz,size(xx));
@@ -28,10 +40,4 @@ colormap cool
 [C,h]=contour(xx, yy, zz, values);
 set(h,'ShowText','on');
 %Plot the training points
-<<<<<<< HEAD
-scatter(X(:,1),X(:,2),50,1-Y);
-
-    
-=======
-scatter(X(:,1),X(:,2),50,1-Y);
->>>>>>> f95ab86406d33374c5363dfec5abd7125c572f68
+scatter(X(:,firstcol),X(:,secondcol),50,1-Y);
