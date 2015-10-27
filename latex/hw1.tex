@@ -161,21 +161,21 @@ Applying our implementation of the soft-SVM to the 4 datasets from part 1, setti
 \begin{figure}[!htb]
 \minipage{0.48\textwidth}
   \includegraphics[width=\linewidth]{figures/stdev1.png}
-  \caption{\texttt{stdev1}}\label{fig:stdev1}
+  \caption{\texttt{stdev = 1}}\label{fig:stdev1}
 \endminipage\hfill
 \minipage{0.48\textwidth}
   \includegraphics[width=\linewidth]{figures/stdev2.png}
-  \caption{\texttt{stdev2}}
+  \caption{\texttt{stdev = 2}}
 \endminipage
 \end{figure}
 \begin{figure}[!htb]
 \minipage{0.48\textwidth}
   \includegraphics[width=\linewidth]{figures/stdev4.png}
-  \caption{\texttt{stdev4}}
+  \caption{\texttt{stdev = 4}}
 \endminipage\hfill
 \minipage{0.48\textwidth}
   \includegraphics[width=\linewidth]{figures/nonsep.png}
-  \caption{\texttt{nonsep}}\label{fig:nonsep}
+  \caption{\texttt{unseparable}}\label{fig:nonsep}
 \endminipage
 \end{figure}
 \end{center}
@@ -254,10 +254,10 @@ We can clearly see from $\theta_i$ that sex is by far the most important factor 
 \end{center}
 \end{figure}
 
-Overall, our final testing error is 81.1.
+Overall, our final testing error is 81.1. The particular values of $\theta$ could be made more reasonable by normalizing the data sets based on the mean and standard deviation, but the overall trend that sex is the defining factor remains the same.
 
 \subsection{Comparing and Contrasting LR and SVM}
-Comparing the results from LR and SVM, we see that they are very similar. They both report the sex as the most important factor when determining $y$, by a large margin. 
+Comparing the results from LR and SVM, we see that they are very similar. They both report the sex as the most important factor when determining $y$, by a large margin. Feature scaling before applying LR is critical in order to avoid convergence towards infinity, but SVM can converge before feature scaling, though it would benefit from feature scaling, since not all of the features have the same scale. However, since many of them are binary, it doesn't make much difference in this particular case.
 \end{document}
 
 
