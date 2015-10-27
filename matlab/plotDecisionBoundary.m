@@ -17,7 +17,7 @@ h = max((maxes(1)-mins(1))/200., (maxes(2)-mins(2))/200.);
 arr=[xx(:),yy(:)];
 zz = zeros(length(arr),1);
 for i=1:length(arr),
-    zz(i) = scoreFn(arr(i,:)'); 
+    zz(i) = scoreFn(arr(i,:)');
 end  
 zz=reshape(zz,size(xx));
    
@@ -28,5 +28,7 @@ colormap cool
 [C,h]=contour(xx, yy, zz, values);
 set(h,'ShowText','on');
 %Plot the training points
+X = X + rand(size(X))*.3-.15;
 scatter(X(:,1),X(:,2),50,1-Y);
+%axis([-1, 2, 0, 80]);
 end
