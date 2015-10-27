@@ -9,6 +9,8 @@
 \usepackage{sidecap}
 \usepackage{float}
 
+\usepackage[font=small,labelfont=bf]{caption}
+
 
 \title{\vspace{-4ex}Regression and SVM\vspace{-3.5ex}}
 \begin{document}
@@ -118,7 +120,6 @@ Support Vector Machines are a machine-learning technique that is used to classif
 \end{equation}
 
 However, we cannot satisfy this minimization if the training set is not linearly separable. Therefore, we add a ``slack variable'' to each constraint, which is a measure of the ``wrongness'' of the decision boundary when classifying that point. We call these slack variables $\xi_i$. We then desire to minimize
-
 \begin{align}
 \min_{\theta, \theta_0, \xi} \dfrac{\lambda}{2} ||\theta||^2 + \dfrac{1}{n} \sum_{i=1}^{n} \xi_{i} &, \\
 s.t. \hspace{.75em} y^{(i)}(\theta^\intercal x^{(i)} + \theta_0) \ge 1 - \xi_i &, \\
@@ -132,7 +133,7 @@ s.t. \hspace{.75em} 0 \le \alpha_i \le C & \\
 \sum_i \alpha_i y^{(i)} = 0 &
 \end{align}
 
-To provide some intuition: $\alpha_i$ is the weight of each training point on the final decision boundary. It is 0 for all $x^{(i)}$ that are farther from the decision boundary than the margin, so that only the ``important'' $x^{(i)}$ are ``support vectors''. $C$ is the maximum value of $\alpha$, and determines the size of the margin. In particular, for small $C$, the margin is very large, and vice versa.. To return from $\alpha$ to the more familiar $\theta$ and $\theta_0$, we plug in:
+To provide some intuition: $\alpha_i$ is the weight of each training point on the final decision boundary. It is 0 for all $x^{(i)}$ that are farther from the decision boundary than the margin, so that only the ``important'' $x^{(i)}$ are ``support vectors''. $C$ is the maximum value of $\alpha$, and determines the size of the margin. In particular, for small $C$, the margin is very large, and vice versa. To return from $\alpha$ to the more familiar $\theta$ and $\theta_0$, we plug in:
 \begin{align}
 \theta &= \sum_{i=1}^n \alpha_i y^{(i)} x^{(i)} \\
 \theta_0 &= \dfrac{1}{\mathcal{M}} \left[ \sum_{j \in \mathcal{M}} \left( y^{(j)} - \sum_{i \in \mathcal{S}} \alpha_i y^{(i)} (x^{(j)})^\intercal x^{(i)} \right) \right]
@@ -143,7 +144,7 @@ Where $\mathcal{M} = \{ i : 0 < \alpha_i < C \}$ and $\mathcal{S} = \{ i : 0 < \
 For example, given the data $X = [1, 2;\ 2, 2;\ 0, 0;\ -2, 3], Y = [1;\ 1;\ -1;\ -1]$, we generate the following objective function and constraints (taking the opportunity to insert a kernel function, $K$):
 
 \begin{equation}
-\min_{\alpha \in \mathbb{R}^n} \left[\dfrac{1}{2} \sum_{i=1}^n \sum_{j=1}^n \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^\intercal x^{(j)} - \sum_{i=1}^n \alpha_i \right] \\
+\max_{\alpha \in \mathbb{R}^n} \left[\sum_{i=1}^n \alpha_i - \dfrac{1}{2} \sum_{i=1}^n \sum_{j=1}^n \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^\intercal x^{(j)} \right] \\
 \Leftrightarrow \min_{\alpha \in \mathbb{R}^n}\left[\dfrac{1}{2} \alpha^\intercal H \alpha + f^\intercal \alpha\right]
 \end{equation}
 \begin{align}
@@ -223,10 +224,17 @@ As per the usual procedure we used in regression on the approximately equivalent
 \section{Titanic Data}
 
 \subsection{LR}
-As an application of our work from previous sections, we can apply both logistic regression and SVMs to a real dataset, namely, separating passengers on the Titanic into survivors and those who were lost at sea. Unlike the previous data, this dataset has 11 parameter columns, each corresponding to some feature of the passengers that we are modeling. Before we do anything, however, we ensure that we are working with a reasonable dataset by scaling the features to have $\mu = 0$ and $\sigma^2 = 1$. This gives us parameters of:
-\begin{table}[!htb]
+As an application of our work from previous sections, we can apply both logistic regression and SVMs to a real dataset, namely, separating passengers on the Titanic into survivors and those who were lost at sea. Unlike the previous data, this dataset has 11 parameter columns, each corresponding to some feature of the passengers that we are modeling. Before we do anything, however, we ensure that we are working with a reasonable dataset by scaling the features to have $\mu = 0$ and $\sigma^2 = 1$. This gives us the parameters in Table 2. From this data, we can see that there is a noticeable relationship between sex and survival; we can plot sex and age to see that there is indeed a correlation in figure \ref{sexagelr}.
+
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{.4\textwidth}
 \centering
-\caption{$\theta_i$ for $\lambda = 1$.}
+\includegraphics[width=\linewidth]{figures/titanic45.png}
+\captionof{figure}{Decision boundary considering only age and sex}\label{sexagelr}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{.59\textwidth}
+\centering
 \begin{tabular}{rlc}
 Column & Meaning                           & $\theta_i$\\ \hline
 1      & Passenger Class 1                 & 0.5843  \\
@@ -241,20 +249,24 @@ Column & Meaning                           & $\theta_i$\\ \hline
 10     & Embark from Cherbourg             & 0.1178  \\
 11     & Embark from Queenstown            & -0.0349  \\
 \end{tabular}
-\end{table}
-From this data, we can see that there is a noticeable relationship between sex and survival; we can plot sex and age to see that there is indeed a correlation:
-\begin{figure}[!htb]
-\begin{center}
-\includegraphics[width=.5\linewidth]{figures/titanic45.png}
-\caption{Decision boundary considering only age and sex}
-\end{center}
-\end{figure}
-\subsection{SVM}
-Now, we apply the SVM to the Titanic dataset. We apply the standard method to select $C$ (ie, calculate the loss on the validation set for the classifiers trained with the training set for various values of $C$.) Applying this method, we get $C = 0.1$, which leads to a validation error of 81.1067. The classifier this creates, using a linear kernel, is summarized below:
+\captionof{table}{$\theta_i$ for $\lambda = 1$.}
 
-\begin{table}[!htb]
+\end{minipage}
+
+\end{minipage}
+
+\subsection{SVM}
+Now, we apply the SVM to the Titanic dataset. We apply the standard method to select $C$ (ie, calculate the loss on the validation set for the classifiers trained with the training set for various values of $C$.) Applying this method, we get $C = 0.1$, which leads to a validation error of 81.1067. The classifier this creates, using a linear kernel, is summarized in Table 3. We can clearly see from $\theta_i$ that sex is by far the most important factor towards determining $y$. Plotting in Figure 23, for example, sex on the x-axis and age on the y-axis, as well as the $\theta$ generated when considering just these two factors, we see that the examples are split fairly well by sex, but age is well-mixed. In the plot, we add a scattering factor of some random number in $[-.15,.15]$ to the plotted points ($\theta$ is trained on the points before the scattering factor).
+
+\begin{minipage}{\textwidth}
+\begin{minipage}[b]{.4\textwidth}
 \centering
-\caption{$\theta_i$ for $C = 0.1$.}
+\includegraphics[width=\linewidth]{figures/sex_age_validate.png}
+\captionof{figure}{Decision boundary considering only age and sex}\label{sexagelr}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{.59\textwidth}
+\centering
 \begin{tabular}{rlc}
 Column & Meaning                           & $\theta_i$\\ \hline
 1      & Passenger Class 1                 & 2.02e-04  \\
@@ -269,16 +281,11 @@ Column & Meaning                           & $\theta_i$\\ \hline
 10     & Embark from Cherbourg             & 1.68e-04  \\
 11     & Embark from Queenstown            & 1.52e-04  \\
 \end{tabular}
-\end{table}
+\captionof{table}{$\theta_i$ for $C = .1$.}
 
-We can clearly see from $\theta_i$ that sex is by far the most important factor towards determining $y$. Plotting, for example, sex on the x-axis and age on the y-axis, as well as the $\theta$ generated when considering just these two factors, we see that the examples are split fairly well by sex, but age is well-mixed. In the plot, we add a scattering factor of some random number in $[-.15,.15]$ to the plotted points ($\theta$ is trained on the points before the scattering factor).
+\end{minipage}
 
-\begin{figure}[!htb]
-\begin{center}
-\includegraphics[width=.75\linewidth]{figures/sex_age_validate.png}
-\caption{Decision boundary considering only age and sex}
-\end{center}
-\end{figure}
+\end{minipage}
 
 Overall, our final testing error is 81.1. The particular values of $\theta$ could be made more reasonable by normalizing the data sets based on the mean and standard deviation, but the overall trend that sex is the defining factor remains the same.
 
