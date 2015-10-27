@@ -35,7 +35,7 @@ s.t. \hspace{.75em} y^{(i)}(\theta^\intercal x^{(i)} + \theta_0) \ge 1 - \xi_i &
 \xi_i \ge 0, i \in n &
 \end{align}
 
-However, we find it more computationally efficient to solve the dual form of the SVM:
+However, we find it more computationally efficient to solve the dual form of the \textbf{Soft-SVM}:
 \begin{align}
 \max_{\alpha \in \mathbb{R}^n} \left[ \sum_{i=1}^n \alpha_i - \dfrac{1}{2} \sum_{i=1}^n \sum_{j=1}^n \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^\intercal x^{(j)}\right] & \\
 s.t. \hspace{.75em} 0 \le \alpha_i \le C & \\
@@ -50,6 +50,46 @@ To provide some intuition: $\alpha_i$ is the weight of each training point on th
 \end{align}
 
 Where $\mathcal{M} = \{ i : 0 < \alpha_i < C \}$ and $\mathcal{S} = \{ i : 0 < \alpha_i \}$.
+
+For example, given the data $X = [1, 2;\ 2, 2;\ 0, 0;\ -2, 3], Y = [1;\ 1;\ -1;\ -1]$, we generate the following objective function:
+
+\begin{equation}
+\min_{\alpha \in \mathbb{R}^n} \left[\dfrac{1}{2} \sum_{i=1}^n \sum_{j=1}^n \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^\intercal x^{(j)} - \sum_{i=1}^n \alpha_i \right]
+\end{equation}
+
+This can be reformulated to be plugged into a standard quadratic programming solver, with \textbf{blah blah blah}
+
+\begin{center}
+\begin{figure}[!htb]
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{figures/C,01sigma1.png}
+  \caption{$C = 0.01, \sigma = 1$}
+\endminipage\hfill
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{figures/C,1sigma1.png}
+  \caption{$C = 0.1, \sigma = 1$}
+\endminipage\hfill
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{figures/C1sigma1.png}
+  \caption{$C = 1, \sigma = 1$}
+\endminipage
+\end{figure}
+\begin{figure}[!htb]
+\hspace{.16\textwidth}
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{figures/C10sigma1.png}
+  \caption{$C = 10, \sigma = 1$}
+\endminipage
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{figures/C100sigma1.png}
+  \caption{$C = 100, \sigma = 1$}
+\endminipage
+\end{figure}
+\end{center}
+
+We also note that as $C$ increases, the number of boundary points decreases. Thus, the number of support vectors decrease. For the nonseparable example, for $C = (.01, .1, 1, 10, 100)$, we see that $\mathcal{M} = (400, 324, 133, 68, 59)$.
+
+As per the usual procedure with the approximately equivalent $\lambda$, to select the correct $C$, we first compute $\alpha$ for various values of $C$ using a training set, then determine the validation error using a validation set. We select the $C$ which produces the lowest validation error in order to maximize the generality of our solution.
 
 \end{document}
 
