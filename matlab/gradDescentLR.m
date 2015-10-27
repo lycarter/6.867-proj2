@@ -34,5 +34,5 @@ for i = 1:size(X, 1)
     up = -Y(i, 1) * (a + w(1, end));
     sum = sum + log(1 + exp(up));
 end
-sum = sum + lambda * w * w';
+sum = sum + lambda * (w * w');
 end

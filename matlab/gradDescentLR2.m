@@ -28,7 +28,7 @@ grad = z./delta;
 end
 
 function sum = f(wn, X, Y, X2, Y2)
-w = gradDescentLR([2,2,2], 0.01, 0.001, X, Y, wn);
+w = gradDescentLR([2,2,2], 0.001, 0.01, X, Y, wn);
 w
 sum = 0;
 for i = 1:size(X, 1)

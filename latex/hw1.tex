@@ -4,18 +4,19 @@
 \DeclareMathOperator{\sign}{sgn}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=0.5in]{geometry}
 \usepackage{graphicx}
 \usepackage{sidecap}
 \usepackage{float}
 
+
 \title{\vspace{-4ex}Regression and SVM\vspace{-3.5ex}}
 \begin{document}
-\newgeometry{top=0.75in,left=1in,right=1in,bottom=1.25in}
+\newgeometry{top=0.75in,left=0.75in,right=0.75in,bottom=1.25in}
 \maketitle
 \vspace{-0.5em}
 \begin{abstract}
-
+Previously, we discussed various methods for polynomial regression and minimizing error in our objective function, and explored famous examples, namely ridge regression and other norms (i.e. LAD for the L1 norm). Here, we will extend those concepts to a few classification problems, through logistic regression (a natural adaptation of the polynomial regression we've been doing) and then more formally through the concept of support vector machines (SVMs).
 \end{abstract}
 
 \section{Logistic Regression}
@@ -27,6 +28,84 @@ given the parameters $w, w_0$. To reduce overfitting, we can apply an $L2$ regul
 $$E_{LR}(w) = \text{NLL}(w)+\lambda w^\intercal w$$
 so that
 $$w^* = \text{argmin}_w \left[\sum_{i=0}^n\log(1+e^{-y^{(i)}(x^{(i)}\cdot w+w_0)}) + \lambda w^\intercal w\right]$$
+
+We can estimate $w$ numerically using stochastic gradient descent; if we let $\lambda = 0$, then we have no regularization and we end up with this data, as well as figures 1-8:
+\begin{table}[h]
+\centering
+\caption{$\lambda=0$ (step = .001, threshold = .008)}
+\begin{tabular}{r|cc|cc|cc|cc}
+   & \multicolumn{2}{|c}{\texttt{stdev1}} & \multicolumn{2}{|c}{\texttt{stdev2}} & \multicolumn{2}{|c}{\texttt{stdev4}} & \multicolumn{2}{|c}{\texttt{data\_nonsep}}\\
+$w_{init}$& \#it         & Loss        & \#it   & Loss &
+\#it   & Loss           & \#it        & Loss      \\\hline
+$[1, 1, 1]$  & 255           &    0        & 91      & 0.09             & 49    & 0.32           & 37            & 0.48        \\
+$[4, 4, 4]$  & 466           & 0         & 259     & 0.12             & 91      & 0.36            & 64           & 0.44      \\
+$[1, 10, 0]$ & 408           &  0         & 354      & 0.11              &  39     & 0.33           & 32            & 0.53      \\
+$[-5, -5, -5]$ & 299         &  0        & 199     & 0.1               &  89     & 0.33            & 73           & 0.49    
+\end{tabular}
+\end{table}
+
+However, if we vary $\lambda$, then we obtain more stable solutions with respect to $w$, and the solutions are more constant regardless of the starting paramters. Figure 9-12 show the decision bounday for $\lambda = 20$.
+\begin{figure}[!htb]
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd1t0.png}
+  \caption{\texttt{stdev = 1}}\label{fig:gradDifQ}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd2t0.png}
+  \caption{\texttt{stdev = 2}}\label{fig:gradDifN}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd4t0.png}
+  \caption{\texttt{stdev = 4}}\label{fig:gradDifS}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sdnt0.png}
+  \caption{\texttt{unseparable}}\label{fig:gradDifS}
+\endminipage
+\end{figure}
+\begin{figure}[!htb]
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd1v0.png}
+  \caption{\texttt{stdev = 1}}\label{fig:gradDifQ}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd2v0.png}
+  \caption{\texttt{stdev = 2}}\label{fig:gradDifN}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd4v0.png}
+  \caption{\texttt{stdev = 4}}\label{fig:gradDifS}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sdnv0.png}
+  \caption{\texttt{unseparable}}\label{fig:gradDifS}
+\endminipage
+
+\end{figure}
+
+
+\begin{figure}[!htb]
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd1v2.png}
+  \caption{\texttt{stdev = 1}}\label{fig:gradDifQ}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd2v20.png}
+  \caption{\texttt{stdev = 2}}\label{fig:gradDifN}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sd4v20.png}
+  \caption{\texttt{stdev = 4}}\label{fig:gradDifS}
+\endminipage\hfill
+\minipage{0.25\textwidth}
+  \includegraphics[width=\linewidth]{figures/sdnv20.png}
+  \caption{\texttt{unseparable}}\label{fig:gradDifS}
+\endminipage
+
+\end{figure}
+
+Figures 1-4 show the training data, and figures 5-8 show the validation data for $\lambda = 0$. The predictor is reasonably effective and seems to seek to minimize the loss. When we increase $\lambda$, however, we instead increase the loss as we try to minimize the $\lambda w^\intercal w$ term in the error function. This means that the model is more inaccurate in this case, which is because with two parameters, $w$ wasn't likely going to overfit to the data anyways. But note that the effect is not too large, even for larger $\lambda$ ($\lambda = 40$) - our main goal is still to minimize the total error.
+
 \section{Support Vector Machines}
 Support Vector Machines are a machine-learning technique that is used to classify binary sets of data. We define $\theta$ as the normal to the decision hyperplane, and classify data points by $\sign (\theta^\intercal x + \theta_0)$. In order to train the classifier, we initially set up the minimization problem (known as \textbf{Hard-SVM}):
 
