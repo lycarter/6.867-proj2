@@ -223,6 +223,32 @@ As per the usual procedure we used in regression on the approximately equivalent
 \section{Titanic Data}
 
 \subsection{LR}
+As an application of our work from previous sections, we can apply both logistic regression and SVMs to a real dataset, namely, separating passengers on the Titanic into survivors and those who were lost at sea. Unlike the previous data, this dataset has 11 parameter columns, each corresponding to some feature of the passengers that we are modeling. Before we do anything, however, we ensure that we are working with a reasonable dataset by scaling the features to have $\mu = 0$ and $\sigma^2 = 1$. This gives us parameters of:
+\begin{table}[!htb]
+\centering
+\caption{$\theta_i$ for $\lambda = 1$.}
+\begin{tabular}{rlc}
+Column & Meaning                           & $\theta_i$\\ \hline
+1      & Passenger Class 1                 & 0.5843  \\
+2      & Passenger Class 2                 & 0.5169  \\
+3      & Passenger Class 3                 & -0.2008 \\
+4      & Sex                               & 1.2356    \\
+5      & Age                               & -0.3297 \\
+6      & Number of Siblings/Spouses Aboard & -0.1402 \\
+7      & Number of Parents/Children Aboard & 0.1596  \\
+8      & Passenger Fare                    & 0.1206   \\
+9      & Embark from Southampton           & -0.0816 \\
+10     & Embark from Cherbourg             & 0.1178  \\
+11     & Embark from Queenstown            & -0.0349  \\
+\end{tabular}
+\end{table}
+From this data, we can see that there is a noticeable relationship between sex and survival; we can plot sex and age to see that there is indeed a correlation:
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=.5\linewidth]{figures/titanic45.png}
+\caption{Decision boundary considering only age and sex}
+\end{center}
+\end{figure}
 \subsection{SVM}
 Now, we apply the SVM to the Titanic dataset. We apply the standard method to select $C$ (ie, calculate the loss on the validation set for the classifiers trained with the training set for various values of $C$.) Applying this method, we get $C = 0.1$, which leads to a validation error of 81.1067. The classifier this creates, using a linear kernel, is summarized below:
 
